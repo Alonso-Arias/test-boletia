@@ -3,6 +3,7 @@ package currency
 import (
 	"context"
 	"regexp"
+	"strings"
 	"time"
 
 	daoCu "github.com/Alonso-Arias/test-boletia/db/dao/currency"
@@ -22,7 +23,7 @@ type FindCurrenciesRequest struct {
 	Fend     time.Time `json:"fend"`
 }
 type FindCurrenciesResponse struct {
-	Currencies []model.CurrencyResponse
+	Currencies map[string][]model.CurrencyResponse `json:"currencies"`
 }
 
 func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesRequest) (FindCurrenciesResponse, error) {
@@ -37,47 +38,50 @@ func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesR
 		return FindCurrenciesResponse{}, err
 	}
 
-	currencyDao := daoCu.NewCurrencyDAO()
-
-	data, err := currencyDao.FindCurrencyValuesByDate(ctx, in.Finit, in.Fend, in.Currency)
+	// se valida las entradas de fechas
+	request, err := dateValidation(ctx, in)
 	if err != nil {
 		return FindCurrenciesResponse{}, err
 	}
 
-	results := []model.CurrencyResponse{}
-	for _, v := range data {
-		c := model.CurrencyResponse{Value: v.Value, Date: v.Timestamp.Format(("2006-01-02T15:04:05"))}
-		results = append(results, c)
+	currencyDao := daoCu.NewCurrencyDAO()
+
+	// Caso especial cuando in.Currency es "all"
+	if strings.ToUpper(in.Currency) == "ALL" {
+		// Obtener todas las divisas con sus valores más recientes
+		allCurrencies, err := currencyDao.GetAllCurrenciesWithLatestValue(ctx)
+		if err != nil {
+			return FindCurrenciesResponse{}, err
+		}
+
+		results := make(map[string][]model.CurrencyResponse)
+		for _, currency := range allCurrencies {
+			if in.Currency == "all" || currency.Code == in.Currency {
+				data := model.CurrencyResponse{Value: currency.Value, Date: currency.Timestamp.Format("2006-01-02T15:04:05")}
+				results[currency.Code] = append(results[currency.Code], data)
+			}
+		}
+
+		return FindCurrenciesResponse{Currencies: results}, nil
+	} else {
+		data, err := currencyDao.FindCurrencyValuesByDate(ctx, request.Finit, request.Fend, in.Currency)
+		if err != nil {
+			return FindCurrenciesResponse{}, err
+		}
+
+		results := make(map[string][]model.CurrencyResponse)
+		for _, v := range data {
+			c := model.CurrencyResponse{Value: v.Value, Date: v.Timestamp.Format("2006-01-02T15:04:05")}
+			results[in.Currency] = append(results[in.Currency], c)
+		}
+
+		if len(results) == 0 {
+			return FindCurrenciesResponse{results}, errs.NotFound
+		}
+
+		return FindCurrenciesResponse{results}, nil
 	}
 
-	// v, err := productDao.Get(ctx, in.Sku)
-	// if err != nil && err != gorm.ErrRecordNotFound {
-	// 	log.WithError(err).Error("problems with getting products")
-	// 	return GetProductResponse{}, err
-	// } else if err == gorm.ErrRecordNotFound {
-	// 	return GetProductResponse{}, errs.ProductsNotFound
-	// }
-
-	// pi, err := productImageDao.FindAll(ctx, v.Sku)
-	// if err != nil {
-	// 	return GetProductResponse{}, err
-	// }
-	// var productsImages []string
-	// for _, item := range pi {
-	// 	productsImages = append(productsImages, item.Url)
-	// }
-	// product := model.Product{
-	// 	Sku:              v.Sku,
-	// 	Name:             v.Name,
-	// 	Brand:            v.Brand,
-	// 	Size:             v.Size,
-	// 	Price:            v.Price,
-	// 	PrincipalImage:   v.PrincipalImage,
-	// 	AdditionalImages: productsImages,
-	// }
-
-	// return GetProductResponse{Product: product}, nil
-	return FindCurrenciesResponse{results}, nil
 }
 
 func requestValidation(in FindCurrenciesRequest) error {
@@ -93,4 +97,36 @@ func requestValidation(in FindCurrenciesRequest) error {
 	}
 
 	return nil
+}
+
+func dateValidation(ctx context.Context, in FindCurrenciesRequest) (FindCurrenciesRequest, error) {
+
+	currencyDao := daoCu.NewCurrencyDAO()
+
+	var start time.Time
+	var end time.Time
+
+	if in.Finit.String() == "0001-01-01 00:00:00 +0000 UTC" {
+		dateInit, err := currencyDao.FindCurrencyValueDate(ctx, in.Currency, "FirstDate")
+		if err != nil {
+			return FindCurrenciesRequest{}, err
+		}
+		start = dateInit
+	} else {
+		start = in.Finit
+	}
+
+	if in.Fend.String() == "0001-01-01 00:00:00 +0000 UTC" {
+		dateEnd, err := currencyDao.FindCurrencyValueDate(ctx, in.Currency, "LastDate")
+		if err != nil {
+			return FindCurrenciesRequest{}, err
+		}
+		end = dateEnd
+	} else {
+		end = in.Fend
+	}
+
+	response := FindCurrenciesRequest{Finit: start, Fend: end}
+
+	return response, nil
 }
