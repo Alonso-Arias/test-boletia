@@ -25,11 +25,16 @@ type FindCurrenciesResponse struct {
 }
 
 func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesRequest) (FindCurrenciesResponse, error) {
-	// log := loggerf.WithField("service", "CurrencyService").WithField("func", "FindCurrencies")
+	log := loggerf.WithField("service", "CurrencyService").WithField("func", "FindCurrencies")
 
-	// if in.Sku == "" {
-	// 	return GetProductResponse{}, errs.BadRequest
-	// }
+	log.Info("start")
+	defer log.Info("finish")
+
+	// se valida request de entrada
+	err := requestValidation(in)
+	if err != nil {
+		return FindCurrenciesResponse{}, err
+	}
 
 	// productDao := dao.NewProductDAO()
 	// productImageDao := dao.NewProductImageDAO()
@@ -64,7 +69,7 @@ func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesR
 	return FindCurrenciesResponse{}, nil
 }
 
-func RequestValidation(in FindCurrenciesRequest) error {
+func requestValidation(in FindCurrenciesRequest) error {
 	// Validar la longitud de la moneda
 	if len(in.Currency) != 3 {
 		return errs.CurrencyInvalidCharacter

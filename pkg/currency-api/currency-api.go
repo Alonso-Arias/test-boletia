@@ -38,7 +38,7 @@ func FindCurrencies(currency string) (model.CurrencyData, error) {
 	}
 	req.Header.Set("Accept", "application/json")
 
-	client := getClientCofiguration()
+	client := getClientConfiguration()
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -66,17 +66,19 @@ func FindCurrencies(currency string) (model.CurrencyData, error) {
 }
 
 // se configuran los deadines de peticiones hacia la api
-func getClientCofiguration() *http.Client {
+// getClientConfiguration configura los timeouts y deadlines de las peticiones hacia la API
+func getClientConfiguration() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
-				Timeout:   time.Duration(5) * time.Second,
-				KeepAlive: time.Duration(5),
+				Timeout:   5 * time.Second, // Tiempo máximo para establecer la conexión
+				KeepAlive: 5 * time.Second, // Tiempo de vida de la conexión abierta
 			}).Dial,
-			TLSHandshakeTimeout:   5 * time.Second,
-			ResponseHeaderTimeout: 5 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
+			TLSHandshakeTimeout:   5 * time.Second, // Tiempo máximo para completar el handshake TLS
+			ResponseHeaderTimeout: 5 * time.Second, // Tiempo máximo para recibir la respuesta después del handshake
+			ExpectContinueTimeout: 1 * time.Second, // Tiempo máximo para recibir una respuesta después de enviar "Expect: 100-continue"
 		},
+		Timeout: 15 * time.Second, // Tiempo máximo para realizar una operación completa, incluyendo conexión, handshake y respuesta del servidor
 	}
 
 	return client
