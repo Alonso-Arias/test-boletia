@@ -1,6 +1,8 @@
 package currencyapi
 
 import (
+	"time"
+
 	daoCl "github.com/Alonso-Arias/test-boletia/db/dao/calls-log"
 	daoCu "github.com/Alonso-Arias/test-boletia/db/dao/currency"
 	"github.com/Alonso-Arias/test-boletia/db/model"
@@ -28,7 +30,7 @@ func FindAndSaveCurrencyValues() {
 
 	// empieza a iterar para guardar todas las divisas con su respectivo valor
 	for _, v := range list.Data {
-		cv := model.Currency{Code: v.Code, Value: v.Value}
+		cv := model.Currency{Code: v.Code, Value: v.Value, Timestamp: time.Now()}
 		err := currencyDao.Save(cv)
 		if err != nil {
 			log.WithError(err).Error("problems with saving value")

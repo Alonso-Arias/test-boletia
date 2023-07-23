@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
 	"time"
 
 	errs "github.com/Alonso-Arias/test-boletia/errors"
@@ -19,7 +20,9 @@ var loggerf = log.LoggerJSON().WithField("package", "context")
 
 var urlBase = "https://api.currencyapi.com/v3/latest"
 
-var apiKey = "cur_live_mhcdXGJOTpPgfyrnE5WWXxsGAysjzHpzvQJT5HOg"
+var apiKey = os.Getenv("APIKEY")
+
+var timeOut = os.Getenv("TIME_OUT_SECONDS")
 
 func FindCurrencies() (model.CurrencyData, time.Duration, error) {
 	log := loggerf.WithField("func", "FindCurrencies")
@@ -53,9 +56,9 @@ func FindCurrencies() (model.CurrencyData, time.Duration, error) {
 	responseTime := time.Since(startTime)
 
 	// Verificación de si el tiempo de respuesta supera el timeout configurado
-	if responseTime > 15*time.Second { // Aquí puedes usar el valor de timeout configurado
-		// Devuelve un error o un custom error para indicar que se superó el timeout
-		return model.CurrencyData{}, responseTime, errs.TimeoutErrorApi
+	err = checkResponseTimeout(responseTime)
+	if err != nil {
+		return model.CurrencyData{}, responseTime, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -65,7 +68,7 @@ func FindCurrencies() (model.CurrencyData, time.Duration, error) {
 	bodyBytes = bytes.TrimPrefix(bodyBytes, []byte("\xef\xbb\xbf")) // evitar problemas de formato utf
 
 	var localsResponse model.CurrencyData
-	// se parsea el json a la structura declarada
+	// se parsea el json a la estructura declarada
 	err = json.Unmarshal(bodyBytes, &localsResponse)
 	if err != nil {
 		return model.CurrencyData{}, 0, err
@@ -77,21 +80,34 @@ func FindCurrencies() (model.CurrencyData, time.Duration, error) {
 
 }
 
-// se configuran los deadines de peticiones hacia la api
 // getClientConfiguration configura los timeouts y deadlines de las peticiones hacia la API
 func getClientConfiguration() *http.Client {
+	// Convierte el valor de string a int64
+	timeOutSeconds, err := strconv.ParseInt(timeOut, 10, 64)
+	if err != nil {
+		// Manejo de error si no se pudo convertir el valor
+		panic(err)
+	}
 	client := &http.Client{
-		Transport: &http.Transport{
-			Dial: (&net.Dialer{
-				Timeout:   5 * time.Second, // Tiempo máximo para establecer la conexión
-				KeepAlive: 5 * time.Second, // Tiempo de vida de la conexión abierta
-			}).Dial,
-			TLSHandshakeTimeout:   5 * time.Second, // Tiempo máximo para completar el handshake TLS
-			ResponseHeaderTimeout: 5 * time.Second, // Tiempo máximo para recibir la respuesta después del handshake
-			ExpectContinueTimeout: 1 * time.Second, // Tiempo máximo para recibir una respuesta después de enviar "Expect: 100-continue"
-		},
-		Timeout: 15 * time.Second, // Tiempo máximo para realizar una operación completa, incluyendo conexión, handshake y respuesta del servidor
+		Timeout: time.Duration(timeOutSeconds) * time.Second, // Tiempo máximo para realizar una operación completa, incluyendo conexión, handshake y respuesta del servidor
 	}
 
 	return client
+}
+
+// checkResponseTimeout verifica si el tiempo de respuesta supera el timeout configurado
+func checkResponseTimeout(responseTime time.Duration) error {
+	// Convierte el valor de string a int64
+	timeOutSeconds, err := strconv.ParseInt(timeOut, 10, 64)
+	if err != nil {
+		// Manejo de error si no se pudo convertir el valor
+		return err
+	}
+
+	if responseTime > time.Duration(timeOutSeconds)*time.Second {
+		// Devuelve un error o un custom error para indicar que se superó el timeout
+		return errs.TimeoutErrorApi
+	}
+
+	return nil
 }
