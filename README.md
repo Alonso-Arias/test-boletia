@@ -1,42 +1,61 @@
-# test-examen
+# test-boletia
 
 ## Requisitos
 
 * Go 1.20.4
-* Swaggo( go get -u -v github.com/swaggo/echo-swagger@v1.3.5 )
-* Echo Swagger ( go get -u -v github.com/swaggo/echo-swagger )
-* MySQL 5.7.x ( docker pull mysql:5.7.33 )
-* go get github.com/alecthomas/template
+* PostgreSQL 15.x ( docker pull postgres:latest )
 ## Ambiente Local ( BD basado en Docker )
 
-* BD: `docker run --name test-db -e MYSQL_ROOT_PASSWORD=123456 -d -p 3306:3306 mysql:5.7.33`
+```
+docker run --name test-boletia-db -e POSTGRES_PASSWORD=123456 -d -p 5432:5432 postgres:latest
+```
 
 ## Creación Esquema y Tablas - Carga datos iniciales ( Basado en Docker)
 
-* Copiar scripts dentro del contenedor : `docker cp ./db/scripts/ test-db:/tmp/`
-* Eliminación y creación de esquema y tablas : `docker exec -t test-db /bin/sh -c 'mysql -u root -p123456 </tmp/scripts/create-db.sql'`
-* Cargar datos de prueba : `docker exec -t test-db /bin/sh -c 'mysql -u root -p123456 </tmp/scripts/basic-data.sql'`
+Copiar scripts dentro del contenedor : 
+```
+docker cp ./db/scripts/ test-boletia-db:/tmp/
+```
+Eliminación y creación de esquema y tablas :
+```
+docker exec -it test-boletia-db psql -U postgres -d test-boletia-db -f /tmp/scripts/create-db.sql
+```
 
-## Generación Documentación Swagger
-
-* `export PATH=$(go env GOPATH)/bin:$PATH`
-* `swag init -g api/api.go -o api/docs`
 
 ## Compilación y Ejecución
 
-* `MYSQL_CONNECTION=root:123456@tcp(localhost:3306)/TEST go run api/api.go`
+```
+make run
+make test
+make lint
+make build
+make clean
+make all
+make             # default is make all
+```
 
-## Link Swagger
+This has been created using go modules; to run the tests, just execute:
 
-* `http://localhost:1323/swagger/index.html`
+```bash
+go test -mod vendor -race -cover -coverprofile=coverage.txt -covermode=atomic ./...
+```
 
-## Ejecución de Tests
+or (using make):
 
-* `MYSQL_CONNECTION=root:123456@tcp(localhost:3306)/TEST go test -v ./db/dao`
+```bash
+make test
+```
+
+The Makefile also supports other commands, such as:
+
+```bash
+make lint
+```
 
 ## Docker
 
 Comandos para generación de contenedor de API. No es necesario para ambiente local.
-
-* `docker build -t exam-test:1.0 .`
-* `docker run -p 1323:1323 --name exam-test exam-test:1.0`
+```bash
+docker build -t test-boletia:1.0 .
+docker run -p 1323:1323 --name test-boletia test-boletia:1.0
+```

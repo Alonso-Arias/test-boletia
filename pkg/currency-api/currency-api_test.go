@@ -3,15 +3,15 @@ package currencyapi
 import (
 	"testing"
 
+	"github.com/Alonso-Arias/test-boletia/pkg/currency-api/client"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFindCurrencies_OK(t *testing.T) {
 	// Configuramos el API Key y la moneda para la prueba
-	currency := "USD" // Cambia esto a la moneda que esperas recibir
 
 	// Ejecutamos la función bajo prueba
-	res, err := FindCurrencies(currency)
+	res, _, err := client.FindCurrencies()
 
 	// Afirmamos que no hay error
 	assert.NoError(t, err, "FindCurrencies error")
@@ -21,11 +21,6 @@ func TestFindCurrencies_OK(t *testing.T) {
 
 	// Afirmamos que la respuesta contiene datos válidos
 	for _, v := range res.Data {
-		assert.NotEmpty(t, v.Symbol, "No data for response")
-	}
-
-	// Afirmamos que la moneda devuelta es la correcta
-	for _, v := range res.Data {
-		assert.Equal(t, currency, v.Code, "Incorrect currency")
+		assert.NotEmpty(t, v.Value, "No data for response")
 	}
 }

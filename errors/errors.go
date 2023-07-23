@@ -28,5 +28,5 @@ var (
 	CurrencyInvalidCharacter = CustomError{Message: "Currency it's contains 3 characters almost", Code: 400, InternalCode: "CURRENCY_CHAR_ERROR"}
 	CurrencyInvalidName      = CustomError{Message: "Currency error name", Code: 400, InternalCode: "CURRENCY_INVALID_ERROR"}
 
-	ProductAlreadySaved = CustomError{Message: "Products already saved", Code: 400, InternalCode: "PRODUCTS_ALREADY_SAVED"}
+	TimeoutErrorApi = CustomError{Message: "Timeout on the call of the api", Code: 504, InternalCode: "TIMEOUT_API"}
 )

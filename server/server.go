@@ -2,13 +2,16 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/Alonso-Arias/test-boletia/handler"
 	"github.com/Alonso-Arias/test-boletia/log"
+	ca "github.com/Alonso-Arias/test-boletia/pkg/currency-api"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -25,6 +28,26 @@ func Run() {
 	e.Use(middleware.Logger())
 
 	setUpServer(e)
+
+	// Obtener el intervalo de tiempo desde una variable de entorno
+	intervalStr := os.Getenv("INTERVAL_MINUTES")
+	intervalMinutes, err := strconv.Atoi(intervalStr)
+	if err != nil {
+		log.WithError(err).
+			WithField("interval_minutes", intervalStr).
+			Fatal("failed to parse interval")
+	}
+
+	// Crear un ticker que se ejecute cada X minutos
+	ticker := time.NewTicker(time.Duration(intervalMinutes) * time.Minute)
+	defer ticker.Stop()
+
+	// Ejecutar la función myRoutine cada vez que el ticker se active
+	go func() {
+		for range ticker.C {
+			myRoutine()
+		}
+	}()
 
 	go func() {
 		log.Info("Starting server")
@@ -64,4 +87,9 @@ func shutdownServer(e *echo.Echo, maximumTime time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), maximumTime)
 	defer cancel()
 	return e.Shutdown(ctx)
+}
+
+func myRoutine() {
+	fmt.Println("Ejecutando rutina...")
+	ca.FindAndSaveCurrencyValues()
 }

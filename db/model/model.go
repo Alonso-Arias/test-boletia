@@ -1,19 +1,17 @@
 package model
 
+import "time"
+
 type Currency struct {
-	ID            int    `json:"id"`
-	Symbol        string `json:"symbol"`
-	Name          string `json:"name"`
-	SymbolNative  string `json:"symbolNative"`
-	DecimalDigits int    `json:"decimalDigits"`
-	Rounding      int    `json:"rounding"`
-	Code          string `json:"code"`
-	NamePlural    string `json:"namePlural"`
+	Id        int       `json:"id"`
+	Code      string    `json:"code"`
+	Value     float64   `json:"value"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 type CallsLog struct {
-	CurrencyId     int `json:"currencyId"`
-	ResponseTimeMs int `json:"responseTimeMs"`
+	CurrencyId     int   `json:"currencyId"`
+	ResponseTimeMs int64 `json:"responseTimeMs"`
 }
 
 func (CallsLog) TableName() string {

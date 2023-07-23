@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"time"
 
+	daoCu "github.com/Alonso-Arias/test-boletia/db/dao/currency"
 	errs "github.com/Alonso-Arias/test-boletia/errors"
 	"github.com/Alonso-Arias/test-boletia/log"
 	"github.com/Alonso-Arias/test-boletia/services/model"
@@ -21,7 +22,7 @@ type FindCurrenciesRequest struct {
 	Fend     time.Time `json:"fend"`
 }
 type FindCurrenciesResponse struct {
-	Currencies model.CurrencyData
+	Currencies []model.CurrencyResponse
 }
 
 func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesRequest) (FindCurrenciesResponse, error) {
@@ -36,8 +37,18 @@ func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesR
 		return FindCurrenciesResponse{}, err
 	}
 
-	// productDao := dao.NewProductDAO()
-	// productImageDao := dao.NewProductImageDAO()
+	currencyDao := daoCu.NewCurrencyDAO()
+
+	data, err := currencyDao.FindCurrencyValuesByDate(ctx, in.Finit, in.Fend, in.Currency)
+	if err != nil {
+		return FindCurrenciesResponse{}, err
+	}
+
+	results := []model.CurrencyResponse{}
+	for _, v := range data {
+		c := model.CurrencyResponse{Value: v.Value, Date: v.Timestamp.Format(("2006-01-02T15:04:05"))}
+		results = append(results, c)
+	}
 
 	// v, err := productDao.Get(ctx, in.Sku)
 	// if err != nil && err != gorm.ErrRecordNotFound {
@@ -66,7 +77,7 @@ func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesR
 	// }
 
 	// return GetProductResponse{Product: product}, nil
-	return FindCurrenciesResponse{}, nil
+	return FindCurrenciesResponse{results}, nil
 }
 
 func requestValidation(in FindCurrenciesRequest) error {

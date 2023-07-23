@@ -5,6 +5,12 @@ TOOLS_DIR := tools
 HOST := localhost
 PORT := 1323
 APIKEY := cur_live_mhcdXGJOTpPgfyrnE5WWXxsGAysjzHpzvQJT5HOg
+HP_POSTGRES_HOST := localhost
+HP_POSTGRES_PORT := 5432
+HP_POSTGRES_USER := pguser
+HP_POSTGRES_PASSWORD := oDIx9eGKzlwqYGeE
+HP_POSTGRES_DB := test-boletia-db
+INTERVAL_MINUTES := 1
 
 default: all
 
@@ -25,8 +31,8 @@ clean:
 	@go mod tidy
 
 .PHONY: run
-run: build
-	HOST=$(HOST) PORT=$(PORT) bin/server
+run: build 
+	INTERVAL_MINUTES=$(INTERVAL_MINUTES) HOST=$(HOST) PORT=$(PORT) HP_POSTGRES_HOST=$(HP_POSTGRES_HOST) HP_POSTGRES_PORT=$(HP_POSTGRES_PORT) HP_POSTGRES_USER=$(HP_POSTGRES_USER) HP_POSTGRES_PASSWORD=$(HP_POSTGRES_PASSWORD) HP_POSTGRES_DB=$(HP_POSTGRES_DB)  bin/server
 
 tools/golangci-lint/golangci-lint:
 	mkdir -p tools/

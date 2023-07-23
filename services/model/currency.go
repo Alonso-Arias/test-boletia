@@ -1,15 +1,20 @@
 package model
 
-type Currency struct {
-	Symbol        string `json:"symbol"`
-	Name          string `json:"name"`
-	SymbolNative  string `json:"symbol_native"`
-	DecimalDigits int    `json:"decimal_digits"`
-	Rounding      int    `json:"rounding"`
-	Code          string `json:"code"`
-	NamePlural    string `json:"name_plural"`
-}
+import "time"
 
 type CurrencyData struct {
-	Data map[string]Currency `json:"data"`
+	Meta struct {
+		LastUpdatedAt time.Time `json:"last_updated_at"`
+	} `json:"meta"`
+	Data map[string]CurrencyInfo `json:"data"`
+}
+
+type CurrencyResponse struct {
+	Value float64 `json:"value"`
+	Date  string  `json:"date"`
+}
+
+type CurrencyInfo struct {
+	Code  string  `json:"code"`
+	Value float64 `json:"value"`
 }
