@@ -18,7 +18,7 @@ import (
 
 var loggerf = log.LoggerJSON().WithField("package", "context")
 
-var urlBase = "https://api.currencyapi.com/v3/latest"
+var urlBase = os.Getenv("API_URL")
 
 var apiKey = os.Getenv("APIKEY")
 
@@ -27,8 +27,12 @@ var timeOut = os.Getenv("TIME_OUT_SECONDS")
 func FindCurrencies() (model.CurrencyData, time.Duration, error) {
 	log := loggerf.WithField("func", "FindCurrencies")
 
+	// params := url.Values{
+	// 	"apikey": {apiKey},
+	// }
+
 	params := url.Values{
-		"apikey": {apiKey},
+		"sleep": {"20000"},
 	}
 
 	fullURL := urlBase + "?" + params.Encode()

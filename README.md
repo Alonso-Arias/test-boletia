@@ -7,20 +7,19 @@
 ## Ambiente Local ( BD basado en Docker )
 
 ```
-docker run --name test-boletia-db -e POSTGRES_PASSWORD=123456 -d -p 5432:5432 postgres:latest
+docker run --name test_boletia_db -e POSTGRES_PASSWORD=123456 -d -p 5433:5432 postgres:latest
 ```
 
 ## Creación Esquema y Tablas - Carga datos iniciales ( Basado en Docker)
 
 Copiar scripts dentro del contenedor : 
 ```
-docker cp ./db/scripts/ test-boletia-db:/tmp/
+docker cp ./db/scripts/ test_boletia_db:/tmp/
 ```
 Eliminación y creación de esquema y tablas :
 ```
-docker exec -it test-boletia-db psql -U postgres -d test-boletia-db -f /tmp/scripts/create-db.sql
+docker exec -it test_boletia_db psql -U postgres -f /tmp/scripts/create-db.sql
 ```
-
 
 ## Compilación y Ejecución
 
@@ -59,3 +58,6 @@ Comandos para generación de contenedor de API. No es necesario para ambiente lo
 docker build -t test-boletia:1.0 .
 docker run -p 1323:1323 --name test-boletia test-boletia:1.0
 ```
+
+
+docker run --name test_boletia_db -e POSTGRES_PASSWORD=123456 -d -p 8000:8000 --network pg_network postgres:latest

@@ -4,14 +4,15 @@ import "time"
 
 type Currency struct {
 	Id        int       `json:"id"`
-	Code      string    `json:"code"`
+	Currency  string    `json:"currency"`
 	Value     float64   `json:"value"`
 	Timestamp time.Time `json:"timestamp"`
 }
 
 type CallsLog struct {
-	CurrencyId     int   `json:"currencyId"`
-	ResponseTimeMs int64 `json:"responseTimeMs"`
+	CallTimestamp  time.Time `json:"callTimestamp"`
+	ResponseTimeMs int64     `json:"responseTimeMs"`
+	Status         string    `json:"status"`
 }
 
 func (CallsLog) TableName() string {

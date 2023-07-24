@@ -56,9 +56,9 @@ func (cs CurrencyService) FindCurrencies(ctx context.Context, in FindCurrenciesR
 
 		results := make(map[string][]model.CurrencyResponse)
 		for _, currency := range allCurrencies {
-			if in.Currency == "all" || currency.Code == in.Currency {
+			if in.Currency == "all" || currency.Currency == in.Currency {
 				data := model.CurrencyResponse{Value: currency.Value, Date: currency.Timestamp.Format("2006-01-02T15:04:05")}
-				results[currency.Code] = append(results[currency.Code], data)
+				results[currency.Currency] = append(results[currency.Currency], data)
 			}
 		}
 

@@ -1,28 +1,20 @@
--- Database: test-boletia-db
+-- Crear una nueva base de datos
+CREATE DATABASE test_boletia_db;
 
-DROP DATABASE IF EXISTS "test-boletia-db";
+-- Conectarse a la nueva base de datos
+\c test_boletia_db;
 
-CREATE DATABASE "test-boletia-db"
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'C'
-    LC_CTYPE = 'C'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
-
-CREATE TABLE IF NOT EXISTS CURRENCIES (
-    ID SERIAL PRIMARY KEY NOT NULL
-    CODE TEXT NOT NULL,
+-- Crear las tablas dentro del nuevo esquema
+CREATE TABLE IF NOT EXISTS public.CURRENCIES (
+    ID SERIAL PRIMARY KEY NOT NULL,
+    CURRENCY TEXT NOT NULL,
     VALUE NUMERIC NOT NULL,
     TIMESTAMP TIMESTAMP NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS CALLS_LOG (
+CREATE TABLE IF NOT EXISTS public.CALLS_LOG (
     ID SERIAL PRIMARY KEY NOT NULL,
-    CALL_TIMESTAMP TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CALL_TIMESTAMP TIMESTAMP NOT NULL,
     RESPONSE_TIME_MS INT NOT NULL,
+    STATUS TEXT NOT NULL
 );
-
