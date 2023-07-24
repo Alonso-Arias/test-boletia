@@ -59,7 +59,7 @@ func (pd *CurrencyDAOImpl) FindCurrencyValuesByDate(ctx context.Context, start t
 	err := db.Model(currencies).
 		Where("timestamp BETWEEN ? AND ?", start.Format("2006-01-02T15:04:05"), end.Format("2006-01-02T15:04:05")).
 		Scopes(CurrencyFilter(strings.ToUpper(currency))).
-		Select("code, value, timestamp").
+		Select("currency, value, timestamp").
 		Find(&currencies).
 		Error
 	if err != nil {
@@ -106,7 +106,7 @@ func CurrencyFilter(currency string) func(db *gorm.DB) *gorm.DB {
 		if currency == "ALL" {
 			return db.Where("")
 		} else {
-			return db.Where("code = ?", currency)
+			return db.Where("currency = ?", currency)
 		}
 	}
 }
@@ -120,12 +120,12 @@ func (pd *CurrencyDAOImpl) GetAllCurrenciesWithLatestValue(ctx context.Context) 
 
 	// Subconsulta para obtener el valor más reciente para cada divisa
 	subquery := db.Table("currencies").
-		Select("code, MAX(timestamp) AS timestamp").
-		Group("code")
+		Select("currency, MAX(timestamp) AS timestamp").
+		Group("currency")
 
 	// Unir la subconsulta con la tabla principal para obtener los valores correspondientes
 	err := db.Table("currencies").
-		Joins("JOIN (?) AS latest ON currencies.code = latest.code AND currencies.timestamp = latest.timestamp", subquery).
+		Joins("JOIN (?) AS latest ON currencies.currency = latest.currency AND currencies.timestamp = latest.timestamp", subquery).
 		Select("currencies.*").
 		Find(&currencies).
 		Error

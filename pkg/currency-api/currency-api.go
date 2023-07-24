@@ -29,7 +29,7 @@ func FindAndSaveCurrencyValues() {
 
 	// se ejecuta el get a la api
 	list, duration, err := client.FindCurrencies()
-	if err != context.DeadlineExceeded {
+	if err == context.DeadlineExceeded {
 		log.WithError(err).Error("timeout error occurred")
 		status = "FAILED"
 	}
