@@ -56,8 +56,5 @@ make lint
 Comandos para generación de contenedor de API. No es necesario para ambiente local.
 ```bash
 docker build -t test-boletia:1.0 .
-docker run -p 1323:1323 --name test-boletia test-boletia:1.0
+docker run -p 1323:1323 --name test-boletia -e HOST=localhost -e PORT=1323 -e API_KEY=cur_live_mhcdXGJOTpPgfyrnE5WWXxsGAysjzHpzvQJT5HOg -e API_URL=https://api.currencyapi.com/v3/latest -e HP_POSTGRES_HOST=localhost -e HP_POSTGRES_PORT=5433 -e HP_POSTGRES_USER=postgres -e HP_POSTGRES_PASSWORD=123456 -e HP_POSTGRES_DB=test_boletia_db -e INTERVAL_MINUTES=1 -e TIME_OUT_SECONDS=5 test-boletia:1.0
 ```
-
-
-docker run --name test_boletia_db -e POSTGRES_PASSWORD=123456 -d -p 8000:8000 --network pg_network postgres:latest
