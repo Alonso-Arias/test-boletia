@@ -47,4 +47,5 @@ lint: $(TOOLS_DIR)/golangci-lint/golangci-lint
 
 .PHONY: test
 test:
-	go test -mod vendor -race -cover -coverprofile=coverage.txt -covermode=atomic ./...
+	go test -mod vendor -race -cover -coverprofile=coverage.txt -covermode=atomic ./... -ldflags="-X main.API_URL=$(API_URL) -X main.API_KEY=$(API_KEY) -X main.TIME_OUT_SECONDS=$(TIME_OUT_SECONDS) -X main.INTERVAL_MINUTES=$(INTERVAL_MINUTES) -X main.HOST=$(HOST) -X main.PORT=$(PORT) -X main.HP_POSTGRES_HOST=$(HP_POSTGRES_HOST) -X main.HP_POSTGRES_PORT=$(HP_POSTGRES_PORT) -X main.HP_POSTGRES_USER=$(HP_POSTGRES_USER) -X main.HP_POSTGRES_PASSWORD=$(HP_POSTGRES_PASSWORD) -X main.HP_POSTGRES_DB=$(HP_POSTGRES_DB)"
+

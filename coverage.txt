@@ -1,0 +1,27 @@
+mode: atomic
+github.com/Alonso-Arias/test-boletia/log/log.go:11.14,13.2 0 1
+github.com/Alonso-Arias/test-boletia/log/log.go:16.41,28.2 5 0
+github.com/Alonso-Arias/test-boletia/log/log.go:31.35,39.2 2 1
+github.com/Alonso-Arias/test-boletia/db/base/base.go:16.13,45.16 10 1
+github.com/Alonso-Arias/test-boletia/db/base/base.go:45.16,47.3 1 0
+github.com/Alonso-Arias/test-boletia/db/base/base.go:52.23,54.2 1 1
+github.com/Alonso-Arias/test-boletia/server/server.go:24.12,35.16 7 0
+github.com/Alonso-Arias/test-boletia/server/server.go:35.16,39.3 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:42.2,46.12 3 0
+github.com/Alonso-Arias/test-boletia/server/server.go:46.12,47.22 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:47.22,49.4 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:52.2,52.12 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:52.12,56.17 3 0
+github.com/Alonso-Arias/test-boletia/server/server.go:56.17,60.4 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:64.2,71.28 6 0
+github.com/Alonso-Arias/test-boletia/server/server.go:74.32,77.2 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:79.44,81.58 2 0
+github.com/Alonso-Arias/test-boletia/server/server.go:81.58,83.3 1 0
+github.com/Alonso-Arias/test-boletia/server/server.go:86.68,90.2 3 0
+github.com/Alonso-Arias/test-boletia/server/server.go:92.18,95.2 2 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:21.34,32.37 6 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:32.37,35.3 2 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:38.2,40.25 2 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:40.25,42.31 1 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:42.31,45.18 3 0
+github.com/Alonso-Arias/test-boletia/pkg/currency-api/currency-api.go:45.18,47.5 1 0

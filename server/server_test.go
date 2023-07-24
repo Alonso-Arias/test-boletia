@@ -15,7 +15,7 @@ import (
 func TestCurrenciesGet(t *testing.T) {
 	// Crea un contexto de prueba
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/currencies/USD", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/currencies/all", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
