@@ -1,26 +1,37 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang:1.17.0-alpine3.13 AS builder
-
-RUN go get -u -v github.com/swaggo/echo-swagger 
-RUN go get -u -v github.com/swaggo/swag/cmd/swag@v1.6.7
+FROM golang:1.20-alpine3.17 as builder
 
 CMD mkdir /app
 COPY . /app
 
 WORKDIR /app
 
-RUN swag init  --parseDependency -g api/api.go -o api/docs
+# Sincronizar el directorio vendor con las dependencias actuales
+RUN go mod vendor
+RUN go mod tidy
 
 # Build the binary.
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api/api api/api.go
+RUN CGO_ENABLED=0 go build -mod vendor -ldflags="-s -w" -o ./bin/server ./cmd/server/
 
 ############################
 # STEP 2 build a small image
 ############################
-FROM alpine:3.12.4
-USER root
-# Copy our static executable.
-CMD mkdir -p /app/service
-COPY --from=builder /app/api/api /app/api/api
+FROM alpine:3.14.2
+
+# Crear un usuario no privilegiado llamado "appuser"
+RUN adduser -D -g '' appuser
+
+USER appuser
+
+# Crear el directorio de la aplicación
+RUN mkdir -p /home/appuser/app
+
+WORKDIR /home/appuser/app
+
+# Copiar el binario desde el builder
+COPY --from=builder /app/bin/server /home/appuser/app/bin/server
+
+# Ejecutar la aplicación
+CMD ["/home/appuser/app/bin/server"]

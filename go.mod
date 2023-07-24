@@ -2,7 +2,10 @@ module github.com/Alonso-Arias/test-boletia
 
 go 1.20
 
-require github.com/labstack/echo/v4 v4.11.1
+require (
+	github.com/labstack/echo/v4 v4.11.1
+	gorm.io/gorm v1.25.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -14,8 +17,8 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/gorm v1.25.0 // indirect
 )
 
 require (
